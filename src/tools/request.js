@@ -1,6 +1,6 @@
 import axios from 'axios';
 import {
-  baseURL
+  baseURL,
 } from '../../config';
 
 const instance = axios.create({

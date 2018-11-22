@@ -30,7 +30,7 @@ class Download {
   async download() {
     let getProListLoad;
     let getTagListLoad;
-    // let downLoadLoad;
+    let downLoadLoad;
     let repos;
     let version;
     try {
@@ -47,22 +47,22 @@ class Download {
       process.exit(-1);
     }
     const choices = repos.map(({
-      name
+      name,
     }) => name);
     const questions = [{
       type: 'list',
       name: 'repo',
       message: '请选择你想要开发的项目类型',
       choices,
-    }, ];
+    }];
     const {
-      repo
+      repo,
     } = await this.inquirer.prompt(questions);
     // 获取项目的版本, 这里默认选择确定项目的最近一个版本
     try {
       getTagListLoad = this.getTagList.start();
       [{
-        name: version
+        name: version,
       }] = await this.git.getProjectVersions(repo);
       getTagListLoad.succeed('获取项目版本成功');
     } catch (error) {
@@ -72,14 +72,35 @@ class Download {
     }
 
     console.log(`您选择的项目是${repo}, 即将下载版本${version}`);
-    // try {
-    //   downLoadLoad = this.downLoad.start();
-
-    //   downLoadLoad.succeed('下载代码成功');
-    // } catch (error) {
-    //   console.log(error);
-    //   downLoadLoad.fail('下载代码失败...');
-    // }
+    // 向用户咨询欲创建项目的目录
+    const repoName = [{
+      type: 'input',
+      name: 'repoPath',
+      message: '请输入项目名称~',
+      validate(v) {
+        const done = this.async();
+        if (!v.trim()) {
+          done('项目名称不能为空~');
+        }
+        done(null, true);
+      },
+    }];
+    const {
+      repoPath,
+    } = await this.inquirer.prompt(repoName);
+    // 下载代码到指定的目录下
+    try {
+      downLoadLoad = this.downLoad.start();
+      await this.git.downloadProject({
+        repo,
+        version,
+        repoPath,
+      });
+      downLoadLoad.succeed('下载代码成功');
+    } catch (error) {
+      console.log(error);
+      downLoadLoad.fail('下载代码失败...');
+    }
   }
 }
 const D = new Download();

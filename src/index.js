@@ -4,13 +4,13 @@ import 'colors';
 import commander from 'commander';
 // 内部模块
 import {
-  existsSync
+  existsSync,
 } from 'fs';
 import {
-  resolve
+  resolve,
 } from 'path';
 import {
-  version
+  version,
 } from '../package.json';
 
 commander.version(version, '-v,--version')
